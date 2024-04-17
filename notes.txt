@@ -1,0 +1,1 @@
+Lägg till best score, samt parameter för justering av hasighet(+- på skärmen) av backgrunden.
