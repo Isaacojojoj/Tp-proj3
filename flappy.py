@@ -17,12 +17,13 @@ pygame.display.set_caption('Flappy Bird')
 font = pygame.font.SysFont('Bauhaus 93', 60)
 
 #define colours
-white = (255, 255, 255)
+white = (255,255,255)
 
 #define game variables
 ground_scroll = 0
 scroll_speed = 4
 flying = False
+minus_boost = False
 game_over = False
 pipe_gap = 150
 pipe_frequency = 1500 #milliseconds
@@ -35,6 +36,8 @@ pass_pipe = False
 bg = pygame.image.load('img/bg.png')
 ground_img = pygame.image.load('img/ground.png')
 button_img = pygame.image.load('img/restart.png')
+plus_img = pygame.image.load('img/plus.png')
+minus_img = pygame.image.load('img/minus.png')
 
 
 #function for outputting text onto the screen
@@ -78,13 +81,16 @@ class Bird(pygame.sprite.Sprite):
 
 		if game_over == False:
 			#jump
-			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-				self.clicked = True
-				self.vel = -10
-			if pygame.mouse.get_pressed()[0] == 0:
-				self.clicked = False
+			self.mid_air = True
+			key = pygame.key.get_pressed()
+			if key[pygame.K_SPACE] and self.jumped == False and self.mid_air == True:  #so that the character dossnt keep jumping up on holding space
+					self.vel = -10
+					self.jumped = True
+			if key[pygame.K_SPACE] == False:
+					self.jumped = False
+				#handle the animation
+   
 
-			#handle the animation
 			flap_cooldown = 5
 			self.counter += 1
 			
@@ -125,6 +131,22 @@ class Pipe(pygame.sprite.Sprite):
 			self.kill()
 
 
+## klass för minus booster
+class Minus(pygame.sprite.Sprite):
+
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load("img/minus.png")
+		self.rect = self.image.get_rect()
+		self.rect.topleft= [x,y]
+
+
+	def update(self):
+		self.rect.x -= scroll_speed
+		if self.rect.right < 0:
+			self.kill()			
+
+
 
 class Button():
 	def __init__(self, x, y, image):
@@ -152,6 +174,7 @@ class Button():
 
 pipe_group = pygame.sprite.Group()
 bird_group = pygame.sprite.Group()
+minus_group = pygame.sprite.Group()
 
 flappy = Bird(100, int(screen_height / 2))
 
@@ -170,6 +193,7 @@ while run:
 	screen.blit(bg, (0,0))
 
 	pipe_group.draw(screen)
+	minus_group.draw(screen)
 	bird_group.draw(screen)
 	bird_group.update()
 
@@ -210,6 +234,17 @@ while run:
 			last_pipe = time_now
 
 		pipe_group.update()
+
+	
+		time_minus = pygame.time.get_ticks()
+		if time_now - last_pipe > pipe_frequency:
+
+			minus = Minus(screen_width, int(screen_height / 2))
+			minus_group.add(minus)
+			last_minus = time_minus
+		
+		minus_group.update()
+		
 
 		ground_scroll -= scroll_speed
 		if abs(ground_scroll) > 35:

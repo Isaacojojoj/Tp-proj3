@@ -6,8 +6,8 @@ pygame.init()
 clock = pygame.time.Clock()
 fps = 60
 
-screen_width = 764
-screen_height = 836
+screen_width = 864
+screen_height = 936
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Flappy Bird')
