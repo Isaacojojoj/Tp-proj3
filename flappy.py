@@ -24,10 +24,17 @@ ground_scroll = 0
 scroll_speed = 4
 flying = False
 minus_boost = False
+plus_boost = False
 game_over = False
-pipe_gap = 150
+pipe_gap = 200
 pipe_frequency = 1500 #milliseconds
+minus_frequency = 1000
+plus_frequency = 1000
 last_pipe = pygame.time.get_ticks() - pipe_frequency
+last_minus = pygame.time.get_ticks() - minus_frequency
+last_plus = pygame.time.get_ticks() - plus_frequency
+# minus_interval = 2000
+# time_minus = 
 score = 0
 pass_pipe = False
 
@@ -83,14 +90,14 @@ class Bird(pygame.sprite.Sprite):
 			#jump
 			self.mid_air = True
 			key = pygame.key.get_pressed()
-			if key[pygame.K_SPACE] and self.jumped == False and self.mid_air == True:  #so that the character dossnt keep jumping up on holding space
+			if key[pygame.K_SPACE] and self.jumped == False and self.mid_air == True:  
 					self.vel = -10
 					self.jumped = True
 			if key[pygame.K_SPACE] == False:
 					self.jumped = False
-				#handle the animation
-   
 
+
+				#handle the animation
 			flap_cooldown = 5
 			self.counter += 1
 			
@@ -143,9 +150,25 @@ class Minus(pygame.sprite.Sprite):
 
 	def update(self):
 		self.rect.x -= scroll_speed
-		if self.rect.right < 0:
-			self.kill()			
 
+		if self.rect.right < 0:
+			self.kill()
+
+## klass för plus booster
+class Plus(pygame.sprite.Sprite):
+
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load("img/plus.png")
+		self.rect = self.image.get_rect()
+		self.rect.topleft= [x,y]
+
+
+	def update(self):
+		self.rect.x -= scroll_speed
+
+		if self.rect.right < 0:
+			self.kill()		
 
 
 class Button():
@@ -175,6 +198,7 @@ class Button():
 pipe_group = pygame.sprite.Group()
 bird_group = pygame.sprite.Group()
 minus_group = pygame.sprite.Group()
+plus_group = pygame.sprite.Group()
 
 flappy = Bird(100, int(screen_height / 2))
 
@@ -194,6 +218,7 @@ while run:
 
 	pipe_group.draw(screen)
 	minus_group.draw(screen)
+	plus_group.draw(screen)
 	bird_group.draw(screen)
 	bird_group.update()
 
@@ -216,13 +241,31 @@ while run:
 	#look for collision
 	if pygame.sprite.groupcollide(bird_group, pipe_group, False, False) or flappy.rect.top < 0:
 		game_over = True
-	#once the bird has hit the ground it's game over and no longer flying
+
+
+	for bird, minus in pygame.sprite.groupcollide(bird_group, minus_group, False, False).items():
+        # Reduce scroll speed
+		scroll_speed = 2
+    	# Remove the collided minus sprites from minus_group			
+		for minus_sprite in minus:
+				minus_sprite.kill()
+	
+	for bird, plus in pygame.sprite.groupcollide(bird_group, plus_group, False, False).items():
+        # Reduce scroll speed
+		scroll_speed = 6
+    	# Remove the collided minus sprites from minus_group			
+		for plus_sprite in plus:
+				plus_sprite.kill()
+
+
+	#once the bird has hit the ground it's game over and no longer flying   
 	if flappy.rect.bottom >= 768:
 		game_over = True
 		flying = False
 
 
 	if flying == True and game_over == False:
+		
 		#generate new pipes
 		time_now = pygame.time.get_ticks()
 		if time_now - last_pipe > pipe_frequency:
@@ -237,13 +280,18 @@ while run:
 
 	
 		time_minus = pygame.time.get_ticks()
-		if time_now - last_pipe > pipe_frequency:
-
+		if time_minus - last_minus > minus_frequency:
 			minus = Minus(screen_width, int(screen_height / 2))
 			minus_group.add(minus)
 			last_minus = time_minus
-		
 		minus_group.update()
+
+		time_plus = pygame.time.get_ticks()
+		if time_plus - last_plus > plus_frequency:
+			plus = Plus(screen_width, int(screen_height / 2))
+			plus_group.add(minus)
+			last_plus = time_plus
+		plus_group.update()
 		
 
 		ground_scroll -= scroll_speed

@@ -67,13 +67,7 @@ class Bird(pygame.sprite.Sprite):
 				self.rect.y += int(self.vel)
 
 		if game_over == False:
-			#jump
-			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-				self.clicked = True
-				self.vel = -10
-			if pygame.mouse.get_pressed()[0] == 0:
-				self.clicked = False
-
+			
 			#handle the animation
 			self.counter += 1
 			flap_cooldown = 5
