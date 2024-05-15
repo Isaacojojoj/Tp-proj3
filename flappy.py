@@ -28,8 +28,8 @@ plus_boost = False
 game_over = False
 pipe_gap = 200
 pipe_frequency = 1500 #milliseconds
-minus_frequency = 1000
-plus_frequency = 1000
+minus_frequency = 1250
+plus_frequency = 900
 last_pipe = pygame.time.get_ticks() - pipe_frequency
 last_minus = pygame.time.get_ticks() - minus_frequency
 last_plus = pygame.time.get_ticks() - plus_frequency
@@ -37,6 +37,7 @@ last_plus = pygame.time.get_ticks() - plus_frequency
 # time_minus = 
 score = 0
 pass_pipe = False
+
 
 
 #load images
@@ -138,7 +139,7 @@ class Pipe(pygame.sprite.Sprite):
 			self.kill()
 
 
-## klass för minus booster
+#klass för minus booster
 class Minus(pygame.sprite.Sprite):
 
 	def __init__(self, x, y):
@@ -154,7 +155,7 @@ class Minus(pygame.sprite.Sprite):
 		if self.rect.right < 0:
 			self.kill()
 
-## klass för plus booster
+#klass för plus booster
 class Plus(pygame.sprite.Sprite):
 
 	def __init__(self, x, y):
@@ -183,7 +184,7 @@ class Button():
 		#get mouse position
 		pos = pygame.mouse.get_pos()
 
-		#check mouseover and clicked conditions
+		# check mouseover and clicked conditions
 		if self.rect.collidepoint(pos):
 			if pygame.mouse.get_pressed()[0] == 1:
 				action = True
@@ -204,7 +205,7 @@ flappy = Bird(100, int(screen_height / 2))
 
 bird_group.add(flappy)
 
-#create restart button instance
+#create rem button instance
 button = Button(screen_width // 2 - 50, screen_height // 2 - 100, button_img)
 
 
@@ -278,18 +279,20 @@ while run:
 
 		pipe_group.update()
 
-	
+		for i in range(2, 4):
+			random_int = random.uniform(2, 3)
+
 		time_minus = pygame.time.get_ticks()
 		if time_minus - last_minus > minus_frequency:
-			minus = Minus(screen_width, int(screen_height / 2))
+			minus = Minus(screen_width, int(screen_height / random_int))
 			minus_group.add(minus)
 			last_minus = time_minus
 		minus_group.update()
 
 		time_plus = pygame.time.get_ticks()
 		if time_plus - last_plus > plus_frequency:
-			plus = Plus(screen_width, int(screen_height / 2))
-			plus_group.add(minus)
+			plus = Plus(screen_width, int(screen_height / random_int))
+			plus_group.add(plus)
 			last_plus = time_plus
 		plus_group.update()
 		
@@ -309,7 +312,7 @@ while run:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			run = False
-		if event.type == pygame.MOUSEBUTTONDOWN and flying == False and game_over == False:
+		if event.type == pygame.KEYDOWN and flying == False and game_over == False:
 			flying = True
 
 	pygame.display.update()
