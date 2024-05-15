@@ -60,7 +60,7 @@ def reset_game():
 	score = 0
 	return score
 
-
+#Animationen för fågeln
 class Bird(pygame.sprite.Sprite):
 
 	def __init__(self, x, y):
@@ -195,7 +195,7 @@ class Button():
 		return action
 
 
-
+#Här tilldelas respektive variabel, respektive grupp
 pipe_group = pygame.sprite.Group()
 bird_group = pygame.sprite.Group()
 minus_group = pygame.sprite.Group()
@@ -278,7 +278,8 @@ while run:
 			last_pipe = time_now
 
 		pipe_group.update()
-
+		
+		#Genereas booster i olika y-led
 		for i in range(2, 4):
 			random_int = random.uniform(2, 3)
 
